@@ -1,0 +1,33 @@
+# Ignore virtual environment folders
+env/
+venv/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore VS Code settings and logs
+.vscode/
+*.log
+
+# Ignore environment/config files
+.env
+*.env
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore compiled Jupyter files
+.ipynb_checkpoints/
+
+# Ignore test coverage, reports, etc.
+.coverage
+htmlcov/
+.tox/
+.nox/
+*.egg-info/
+dist/
+build/
