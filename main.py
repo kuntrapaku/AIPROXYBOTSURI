@@ -1,46 +1,66 @@
 import threading
+import uvicorn
+import psutil
+import sys
+
 from utils.monitor import monitor_services
 from run_backend import run_backend
 from run_frontend import run_frontend
-from threading import Thread
-import uvicorn
+
+
+# def is_already_running(script_name="main.py"):
+#     """
+#     Prevents multiple instances of the orchestrator from running.
+#     """
+#     current_pid = psutil.Process().pid
+#     for proc in psutil.process_iter(['pid', 'cmdline']):
+#         try:
+#             cmdline = proc.info.get('cmdline') or []
+#             if script_name in ' '.join(cmdline) and proc.pid != current_pid:
+#                 return True
+#         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+#             continue
+#     return False
 
 
 def start_agent_server():
     """
     Starts the FastAPI server for the AI Agent.
-    This exposes a POST /ask endpoint on port 5000.
     """
-    # Binding to 0.0.0.0 is important so mobile app (React Native) can access it over LAN
     uvicorn.run("agent.agent_server:app", host="0.0.0.0", port=5000, reload=False)
-
 
 
 def main():
     print("Starting Backend, Frontend, and Monitoring Services...")
 
-    # ✅ Run backend synchronously and wait
+    # ✅ Prevent duplicate main.py instances
+    # if is_already_running():
+    #     print("[WARN] Another instance of main.py is already running. Exiting.")
+    #     sys.exit(1)
+
+    # ✅ Start backend synchronously
     backend_ok = run_backend()
     if not backend_ok:
         print("[FATAL] Backend failed to start. Aborting.")
         return
 
-    # ✅ Run frontend
+    # ✅ Start other services in threads
     frontend_thread = threading.Thread(target=run_frontend)
-    frontend_thread.start()
-
-    # ✅ Monitor only after frontend starts
     monitor_thread = threading.Thread(target=monitor_services)
-    monitor_thread.start()
-
     agent_thread = threading.Thread(target=start_agent_server)
+
+    frontend_thread.start()
+    monitor_thread.start()
     agent_thread.start()
 
-    frontend_thread.join()
-    monitor_thread.join()
-    agent_thread.join()
-    
-
+    # ✅ Join threads gracefully, allow CTRL+C exit
+    try:
+        frontend_thread.join()
+        monitor_thread.join()
+        agent_thread.join()
+    except KeyboardInterrupt:
+        print("\n[INFO] Shutdown requested. Exiting gracefully...")
+        sys.exit(0)
 
 
 if __name__ == "__main__":

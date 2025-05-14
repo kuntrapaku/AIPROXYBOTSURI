@@ -3,7 +3,7 @@ import requests
 import subprocess
 from utils.logger import log_error
 
-BACKEND_URL = "http://localhost:8080"
+BACKEND_URL = "http://localhost:8080/api/chat/ask"
 FRONTEND_PORT = 8081
 
 def monitor_services():
