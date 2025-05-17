@@ -9,9 +9,10 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from agent.agent_core import ask_agent
+from interface.api.template_routes import router as template_router
 
 app = FastAPI()
-
+app.include_router(template_router)
 # ✅ Enable CORS so frontend/backend can call this easily
 app.add_middleware(
     CORSMiddleware,

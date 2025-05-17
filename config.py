@@ -8,6 +8,9 @@ load_dotenv(dotenv_path=env_path)
 
 # OpenAI API Key (loaded from environment variable)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+# Missing this:
+MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+
 
 # Project Paths (use environment variables with fallback)
 INTELLIJ_PROJECT_PATH = os.getenv("INTELLIJ_PROJECT_PATH", "C:/Users/suri2/mvc")
